@@ -1,82 +1,265 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="zh">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>定位</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=9f831272996d8fb9c2765393725e3f96"></script>
-<body>
-    <div id='container'></div>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>签到</title>
+    <!-- head 中 -->
+    <link rel="stylesheet" href="/public/css/weui.min.css">
+    <link rel="stylesheet" href="/public/css/jquery-weui.min.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/index.css" />
+    <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=b9d74f29443eedc8cc51606e45f23d29&plugin=AMap.ToolBar"></script> -->
+    <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.3&key=9f831272996d8fb9c2765393725e3f96"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <style>
+        #container {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            font-size: 12px;
+        }
+        
+        #tip {
+            top: 82px;
+        }
+    </style>
+</head>
+
+<body ontouchstart>
+    <div class="topf pf">
+        <a href="javascript:;" class="goBack pa" onClick="javascript :history.back(-1);">
+            <i class="iconfont">&#xe606;</i>
+        </a>
+        <h1 class="tac">签到</h1>
+    </div>
+    <!-- <div id="mapContainer" style="height: 28rem;"></div> -->
+    <div id='container' style="height: 28rem;"></div>
     <div id="tip"></div>
+
+    <!-- 腾讯地图获取当前位置经纬度 -->
+    <!-- <iframe id="geoPage" width=0 height=0 frameborder=0 style="display:none;" scrolling="no" src="https://apis.map.qq.com/tools/geolocation?key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp"></iframe> -->
+
+    <div class="wrap mapInfo" style="z-index: 999;">
+        <h4>地址</h4>
+        <h5 id="address"></h5>
+        <i id="dqlongitude" style="display: none"></i>
+        <i id="dqlatitude" style="display: none"></i>
+    </div>
+
+    <!-- 签到 -->
+    <!--<div class="footQd clearfix">-->
+    <!--<a href="javascript:;" class="fl qdao">可签到</a>-->
+    <!--<p>您已进入签到范围，可签到</p>-->
+    <!--</div>-->
+    <!-- 签到 -->
+    <a href="javascript:;" class="qiandtn" style="z-index: 999;">签到</a>
+    <!-- 签到成功弹窗-->
+    <div class="cgBaom">
+        <div class="bmTc qdTc">
+            <img src="/public/images/qdao.png">
+        </div>
+    </div>
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/fastclick.js"></script>
+    <!-- <script>
+        $(function() {
+            FastClick.attach(document.body);
+        });
+    </script> -->
+    <script src="/public/js/jquery-weui.js"></script>
+    <script src='/public/js/swiper.min.js' type='text/javascript'></script>
+    <script src="/public/js/index.js" type="text/javascript" charset="utf-8"></script>
+    <!-- <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=RMVBZ-6XXYW-UKBRE-O27BE-ZK7TQ-SZBHT"></script> -->
+    <script>
+        // 获取cookie中的openid  函数中的参数为 要获取的cookie键的名称。
+        function getCookie(openid) {
+            console.log(openid)
+            if (document.cookie.length > 0) {
+                c_start = document.cookie.indexOf(openid + "=");
+                if (c_start != -1) {
+                    c_start = c_start + openid.length + 1;
+                    c_end = document.cookie.indexOf(";", c_start);
+                    if (c_end == -1) {
+                        c_end = document.cookie.length;
+                    }
+                    return unescape(document.cookie.substring(c_start, c_end));
+                }
+            }
+            return "";
+        }
+        var openid = getCookie('openid');
+        // alert(openid);
+
+        //页面传值
+        function getUrlParam(name) {
+            console.log(name)
+                // 用该属性获取页面 URL 地址从问号 (?) 开始的 URL（查询部分）
+            var url = window.location.search;
+            // 正则筛选地址栏
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            // 匹配目标参数
+            var result = url.substr(1).match(reg);
+            //返回参数值
+            return result ? decodeURIComponent(result[2]) : null;
+        }
+        var id = getUrlParam('id');
+        id = id.replace("\'", "").replace("\'", "");
+        console.log(id);
+
+        var address = getUrlParam('address');
+        console.log(address)
+        $("#address").text(address);
+
+        var latitude = getUrlParam('latitude'); //纬度
+        console.log(latitude)
+        var longitude = getUrlParam('longitude'); //经度
+        console.log(longitude)
+
+        // $('#markPage').attr('src','https://apis.map.qq.com/tools/poimarker?type='+0+'&marker=coord:'+ latitude+','+longitude+';'+'addr:'+address+'&key='+'OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77'+'&referer=myapp');
+
+        // function init() {
+        //     map = new AMap.Map("mapContainer", {
+        //         zoom: 18,
+        //         center: [longitude, latitude]
+        //     });
+        //     marker = new AMap.Marker({
+        //         map: map,
+        //         position: [longitude, latitude]
+        //     });
+        // marker.setLabel({
+        //     offset: new AMap.Pixel(20, 20),//修改label相对于maker的位置
+        //     content: "点击Marker打开高德地图"
+        // });
+        // marker.on('click',function(e){
+        //     marker.markOnAMAP({
+        //         position:marker.getPosition()
+        //     })
+        // })
+        // map.addControl(new AMap.ToolBar());
+
+        // }
+
+
+        //当前位置
+        // window.addEventListener('message', function(event) {
+        //     console.log(event)
+        //         // 接收位置信息
+        //     var loc = event.data;
+        //     console.log(loc)
+        //     console.log('经度' + loc.lng)
+        //     console.log('纬度' + loc.lat)
+        //     $("#dqlongitude").text(loc.lng);
+        //     $("#dqlatitude").text(loc.lat);
+
+        // }, false);
+        // setTimeout(function() {
+        //         if (!this.loc) {
+        //             console.log('定位超时')
+        //         }
+        //     }, 6000) // 6s为推荐值，业务调用方可根据自己的需求设置改时间，不建议太短
+
+
+        window.onload = function() {
+            var map, geolocation;
+            map = new AMap.Map('container');
+            console.log(map)
+            map.plugin('AMap.Geolocation', function() {
+                geolocation = new AMap.Geolocation({
+                    enableHighAccuracy: true, //是否使用高精度定位，默认:true
+                    timeout: 10000, //超过10秒后停止定位，默认：无穷大
+                    maximumAge: 0, //定位结果缓存0毫秒，默认：0
+                    convert: true, //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+                    showButton: true, //显示定位按钮，默认：true
+                    buttonPosition: 'LB', //定位按钮停靠位置，默认：'LB'，左下角
+                    buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                    showMarker: true, //定位成功后在定位到的位置显示点标记，默认：true
+                    showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
+                    panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
+                    zoomToAccuracy: true //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                });
+                map.addControl(geolocation);
+                geolocation.getCurrentPosition();
+                AMap.event.addListener(geolocation, 'complete', onComplete); //返回定位信息
+                AMap.event.addListener(geolocation, 'error', onError); //返回定位出错信息
+            });
+            var myplace = ''; //我的位置
+            var mycity = ''; //我所在的城市
+            //解析定位结果
+            function onComplete(data) {
+                console.log(data)
+                var str = ['定位成功'];
+                str.push('经度：' + data.position.getLng());
+                str.push('纬度：' + data.position.getLat());
+                if (data.accuracy) {
+                    str.push('精度：' + data.accuracy + ' 米');
+                } //如为IP精确定位结果则没有精度信息
+                str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+                document.getElementById('tip').innerHTML = str.join('<br>');
+                // parent.loca(data);
+                myplace = data.formattedAddress; //我的位置
+                mycity = data.addressComponent.city; //我所在的城市
+                console.log('str', data.position.getLng(), data.position.getLat());
+                console.log("我所在的地点为 " + data.formattedAddress);
+                console.log("我所在的城市为 " + data.addressComponent.province);
+            }
+
+            function getSomeOfMyVal() {
+                return myplace + "+" + mycity;
+            }
+
+            //解析定位错误信息
+            function onError(data) {
+                document.getElementById('tip').innerHTML = '定位失败';
+            }
+
+            function getGeolocation() {
+                geolocation.getCurrentPosition();
+
+            }
+        }
+        $(".qiandtn").click(function() {
+
+            var dqlongitude = $("#dqlongitude").text();
+            console.log('经度' + dqlongitude)
+            var dqlatitude = $("#dqlatitude").text();
+            console.log('纬度' + dqlatitude)
+            var url = "http://admin.volcare.cn/api/activity/activitySign";
+            var data = {
+                open_id: openid,
+                activity_id: id,
+                longitude: dqlongitude,
+                latitude: dqlatitude
+            };
+            console.log(data)
+            $.post(url, data, function(data) {
+
+                console.log(data);
+                if (data.code == 400) {
+                    $.toast(data.message, 'text');
+                } else {
+                    $(".cgBaom").show();
+                    setTimeout(function() {
+                        $(".cgBaom").hide();
+                        window.location.href = "signout.html?id=" + id + '&address=' + address + '&latitude=' + latitude + '&longitude=' + longitude;
+                    }, 2000)
+                }
+
+                // $(".cgBaom").show();     签到成功
+            })
+        });
+
+        $(".cgBaom").click(function() {
+            $(this).hide();
+            window.location.href = "signout.html";
+        });
+    </script>
 </body>
 
 </html>
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-<script type="text/javascript">
-    /***************************************
-                        由于Chrome、IOS10等已不再支持非安全域的浏览器定位请求，为保证定位成功率和精度，请尽快升级您的站点到HTTPS。
-                        ***************************************/
-    window.onload = function() {
-
-    var map, geolocation;
-    map = new AMap.Map('container');
-   console.log('1111222');
-   console.log(AMap);
-    map.plugin('AMap.Geolocation', function() {
-            geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true, //是否使用高精度定位，默认:true
-                timeout: 10000, //超过10秒后停止定位，默认：无穷大
-                maximumAge: 0, //定位结果缓存0毫秒，默认：0
-                convert: true, //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-                showButton: true, //显示定位按钮，默认：true
-                buttonPosition: 'LB', //定位按钮停靠位置，默认：'LB'，左下角
-                buttonOffset: new AMap.Pixel(10, 20), //定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-                showMarker: true, //定位成功后在定位到的位置显示点标记，默认：true
-                showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
-                panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
-                zoomToAccuracy: true //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-            });
-            map.addControl(geolocation);
-            geolocation.getCurrentPosition();
-            AMap.event.addListener(geolocation, 'complete', onComplete); //返回定位信息
-            AMap.event.addListener(geolocation, 'error', onError); //返回定位出错信息
-        });
-    var myplace = ''; //我的位置
-    var mycity = ''; //我所在的城市
-    }
-    //解析定位结果
-    function onComplete(data) {
-        var str = ['定位成功'];
-        str.push('经度：' + data.position.getLng());
-        str.push('纬度：' + data.position.getLat());
-        if (data.accuracy) {
-            str.push('精度：' + data.accuracy + ' 米');
-        } //如为IP精确定位结果则没有精度信息
-        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
-        document.getElementById('tip').innerHTML = str.join('<br>');
-        // parent.loca(data);
-        myplace = data.formattedAddress; //我的位置
-        mycity = data.addressComponent.city; //我所在的城市
-        console.log('str', data.position.getLng(), data.position.getLat());
-        console.log("我所在的地点为 " + data.formattedAddress);
-        console.log("我所在的城市为 " + data.addressComponent.city);
-    }
-
-    function getSomeOfMyVal() {
-        return myplace + "+" + mycity;
-    }
-
-    //解析定位错误信息
-    function onError(data) {
-        document.getElementById('tip').innerHTML = '定位失败';
-    }
-
-    function getGeolocation() {
-        geolocation.getCurrentPosition();
-
-    }
+<script>
+    eruda.init();
 </script>
