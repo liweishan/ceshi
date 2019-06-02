@@ -12,8 +12,9 @@
     <link rel="stylesheet" type="text/css" href="/public/css/index.css" />
     <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.3&key=b9d74f29443eedc8cc51606e45f23d29&plugin=AMap.ToolBar"></script> -->
     <link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.3&key=9f831272996d8fb9c2765393725e3f96"></script>
-    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.3&key=9f831272996d8fb9c2765393725e3f96"></script> -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=300e68566335dce41d59bedca21d0a9c"></script>
+    <!-- <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script> -->
     <style>
         #container {
             margin: 0;
@@ -29,14 +30,14 @@
 </head>
 
 <body ontouchstart>
-    <div class="topf pf">
+    <div style="overflow: hidden;" class="topf pf">
         <a href="javascript:;" class="goBack pa" onClick="javascript :history.back(-1);">
             <i class="iconfont">&#xe606;</i>
         </a>
         <h1 class="tac">签到</h1>
     </div>
     <!-- <div id="mapContainer" style="height: 28rem;"></div> -->
-    <div id='container' style="height: 28rem;"></div>
+    <div id='container' style="height: 28rem;z-index: 999;"></div>
     <div id="tip"></div>
 
     <!-- 腾讯地图获取当前位置经纬度 -->
@@ -90,7 +91,7 @@
             }
             return "";
         }
-        var openid = getCookie('openid');
+        // var openid = getCookie('openid');
         // alert(openid);
 
         //页面传值
@@ -105,18 +106,18 @@
             //返回参数值
             return result ? decodeURIComponent(result[2]) : null;
         }
-        var id = getUrlParam('id');
-        id = id.replace("\'", "").replace("\'", "");
-        console.log(id);
+        // var id = getUrlParam('id');
+        // id = id.replace("\'", "").replace("\'", "");
+        // console.log(id);
 
-        var address = getUrlParam('address');
-        console.log(address)
-        $("#address").text(address);
+        // var address = getUrlParam('address');
+        // console.log(address)
+        // $("#address").text(address);
 
-        var latitude = getUrlParam('latitude'); //纬度
-        console.log(latitude)
-        var longitude = getUrlParam('longitude'); //经度
-        console.log(longitude)
+        // var latitude = getUrlParam('latitude'); //纬度
+        // console.log(latitude)
+        // var longitude = getUrlParam('longitude'); //经度
+        // console.log(longitude)
 
         // $('#markPage').attr('src','https://apis.map.qq.com/tools/poimarker?type='+0+'&marker=coord:'+ latitude+','+longitude+';'+'addr:'+address+'&key='+'OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77'+'&referer=myapp');
 
